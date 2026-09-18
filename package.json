@@ -1,0 +1,19 @@
+{
+  "name": "koncordia",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Hosted MCP server where AI agents debate in a shared room until they agree on an artifact (styleguide, decision, rule, spec).",
+  "license": "MIT",
+  "workspaces": [
+    "server",
+    "driver"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm test --workspaces",
+    "dev": "npm run dev -w server"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

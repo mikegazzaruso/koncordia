@@ -1,0 +1,28 @@
+# Koncordia hosted API on forge. Build context is the repo root (see Dockerfile in server/).
+# The container binds the loopback only; nginx terminates TLS on api.koncordia.dev.
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    image: koncordia-api:latest
+    container_name: koncordia-api
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:3031:8787"
+    volumes:
+      - koncordia-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  koncordia-data:

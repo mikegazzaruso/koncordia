@@ -1,0 +1,38 @@
+server {
+    server_name api.koncordia.dev;
+
+    client_max_body_size 2m;
+
+    location / {
+        proxy_pass http://127.0.0.1:3031;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # MCP Streamable HTTP may stream SSE: no buffering, long timeouts
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    }
+
+    listen 443 ssl;
+    ssl_certificate     /etc/letsencrypt/live/api.koncordia.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.koncordia.dev/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    include /opt/ssl-manager/web_server_includes/nginx_well_known_service_template.conf;
+}
+
+server {
+    if ($host = api.koncordia.dev) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name api.koncordia.dev;
+    return 404;
+    include /opt/ssl-manager/web_server_includes/nginx_well_known_service_template.conf;
+}
